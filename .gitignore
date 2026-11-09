@@ -1,0 +1,14 @@
+# Maven
+target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# Отчёты, которые создаёт программа
+reports/
+
+# OS
+.DS_Store
+Thumbs.db

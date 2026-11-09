@@ -1,0 +1,64 @@
+@startuml
+' ER-диаграмма базы данных «Кинотеатр»
+hide circle
+skinparam linetype ortho
+
+entity genres {
+  * id : SERIAL <<PK>>
+  --
+  * name : VARCHAR(50) <<UNIQUE>>
+}
+
+entity films {
+  * id : SERIAL <<PK>>
+  --
+  * title : VARCHAR(150)
+  * duration_min : INT
+  * age_rating : INT
+  * genre_id : INT <<FK>>
+}
+
+entity halls {
+  * id : SERIAL <<PK>>
+  --
+  * name : VARCHAR(50) <<UNIQUE>>
+  * hall_type : VARCHAR(20)
+  * seats : INT
+}
+
+entity screenings {
+  * id : SERIAL <<PK>>
+  --
+  * film_id : INT <<FK>>
+  * hall_id : INT <<FK>>
+  * start_time : TIMESTAMP
+  * base_price : NUMERIC(8,2)
+}
+
+entity customers {
+  * id : SERIAL <<PK>>
+  --
+  * full_name : VARCHAR(100)
+  * phone : VARCHAR(20) <<UNIQUE>>
+  email : VARCHAR(100)
+  * is_student : BOOLEAN
+}
+
+entity tickets {
+  * id : SERIAL <<PK>>
+  --
+  * screening_id : INT <<FK>>
+  * customer_id : INT <<FK>>
+  * seat_number : INT
+  * price : NUMERIC(8,2)
+  * status : VARCHAR(20)
+  payment_method : VARCHAR(20)
+  * sold_at : TIMESTAMP
+}
+
+genres ||--o{ films
+films ||--o{ screenings
+halls ||--o{ screenings
+screenings ||--o{ tickets
+customers ||--o{ tickets
+@enduml

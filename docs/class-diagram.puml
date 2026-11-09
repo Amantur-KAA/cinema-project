@@ -1,0 +1,98 @@
+@startuml
+' Class diagram (главные классы)
+skinparam classAttributeIconSize 0
+
+package model {
+  class Genre { -id: int; -name: String }
+  class Film { -id: int; -title: String; -durationMinutes: int; -ageRating: int }
+  abstract class Hall {
+    -id: int; -name: String; -seats: int
+    +{abstract} getPriceMultiplier(): double
+    +{abstract} getType(): String
+    +calculatePrice(base: double): double
+  }
+  class StandardHall
+  class VipHall
+  class ImaxHall
+  class HallFactory { +{static} create(type, id, name, seats): Hall }
+  class Screening { -id: int; -startTime: LocalDateTime; -basePrice: double; +overlapsWith(other): boolean }
+  class Customer { -id: int; -fullName: String; -phone: String; -email: String; -student: boolean }
+  class Ticket { -id: int; -seatNumber: int; -price: double; +pay(method); +cancel() }
+  enum TicketStatus { BOOKED; PAID; CANCELLED }
+}
+
+package payment {
+  abstract class Payment { #amount: double; +{abstract} pay() }
+  interface Refundable { +refund(amount); +printPolicy() }
+  class CardPayment
+  class CashPayment
+  class PaymentFactory
+}
+
+package discount {
+  interface DiscountStrategy { +apply(price): double }
+  class NoDiscount
+  class PercentDiscount
+  class FixedDiscount
+}
+
+package config {
+  class AppConfig <<Singleton>>
+  class Database
+}
+
+package dao {
+  class FilmDao
+  class CustomerDao
+  class ScreeningDao
+  class TicketDao
+  class ReportDao
+}
+
+package service {
+  class FilmService
+  class CustomerService
+  class ScreeningService
+  class BookingService
+  class ReportService
+}
+
+package ui {
+  class ConsoleMenu
+  class InputReader
+}
+
+Film "*" --> "1" Genre
+Screening "*" --> "1" Film
+Screening "*" --> "1" Hall
+Ticket "*" --> "1" Screening
+Ticket "*" --> "1" Customer
+Ticket --> TicketStatus
+Hall <|-- StandardHall
+Hall <|-- VipHall
+Hall <|-- ImaxHall
+HallFactory ..> Hall
+Payment <|-- CardPayment
+Payment <|-- CashPayment
+Refundable <|.. CardPayment
+PaymentFactory ..> Payment
+DiscountStrategy <|.. NoDiscount
+DiscountStrategy <|.. PercentDiscount
+DiscountStrategy <|.. FixedDiscount
+
+ConsoleMenu o-- InputReader
+ConsoleMenu --> FilmService
+ConsoleMenu --> CustomerService
+ConsoleMenu --> ScreeningService
+ConsoleMenu --> BookingService
+ConsoleMenu --> ReportService
+FilmService --> FilmDao
+CustomerService --> CustomerDao
+ScreeningService --> ScreeningDao
+BookingService --> TicketDao
+BookingService ..> DiscountStrategy
+BookingService ..> PaymentFactory
+ReportService --> ReportDao
+dao ..> Database
+Database ..> AppConfig
+@enduml
